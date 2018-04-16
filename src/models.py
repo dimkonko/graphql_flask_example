@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func, Table
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func, Table, outerjoin
 from sqlalchemy.orm import backref, relationship
 
 from src.database import Base
@@ -28,7 +28,12 @@ class Student(Base):
     name = Column(String)
 
     # classes = relationship('ClasseStudent')
-    classes = relationship('Classe', secondary=ass, lazy='joined')
+    classes = relationship('Classe',
+                           secondary=ass,
+                           # secondaryjoin=id == ass.c.student_id
+                           lazy='subquery'
+                           )
+    # results = relationship('Result', lazy='joined')
 
 
 class Classe(Base):
@@ -37,4 +42,15 @@ class Classe(Base):
     name = Column(String)
 
     # students = relationship('ClasseStudent', lazy='joined')
-    students = relationship('Student', secondary=ass, lazy='joined')
+    students = relationship('Student',
+                            secondary=ass,
+                            # secondaryjoin=id == ass.c.classe_id,
+                            lazy='subquery'
+                            )
+
+
+# class Result(Base):
+#     __tablename__ = 'result'
+#     id = Column(Integer, primary_key=True)
+#     name = Column(String)
+#     mark = Column(Integer)
